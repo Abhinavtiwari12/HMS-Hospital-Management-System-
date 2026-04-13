@@ -39,6 +39,18 @@ const userSchema = new Schema ({
             message: "Invilade email"
         }
     },
+    gender: {
+        type: String,
+        enum: ["male", "female", "other"]
+    },
+    role: {
+        type: String,
+        enum: ["patient", "doctor", "admin"],
+        default: "patient"
+    },
+    dateOfBirth: {
+        type: Date
+    },
     refreshToken:{
         type: String
     }
