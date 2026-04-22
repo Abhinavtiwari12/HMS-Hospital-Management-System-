@@ -3,9 +3,21 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const doctorSchema = new Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+    doctorName: {
+        // type: mongoose.Schema.Types.ObjectId,
+        // ref: "User",
+        type: String,
+        required: true
+    },
+
+    email:{
+        type: String,
+        required: true,
+        unique: true
+    },
+
+    password: {
+        type: String,
         required: true
     },
 
