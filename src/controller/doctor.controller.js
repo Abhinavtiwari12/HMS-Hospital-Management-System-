@@ -3,17 +3,18 @@ import { ApiError } from "../utills/apiError"
 import { ApiResponse } from "../utills/apiResponse"
 import { asyncHandler } from "../utills/asyncHandler"
 import { Doctor } from "../models/doctor.model"
+import { contains } from "validator"
 
 
 
 const generateAccessAndRefereshTokens = async(userId) =>{
     try {
-        const user = await User.findById(userId)
-        const accessToken = user.generateAccessToken()
-        const refreshToken = user.generateRefreshToken()
+        const doctor = await Doctor.findById(userId)
+        const accessToken = doctor.generateAccessToken()
+        const refreshToken = doctor.generateRefreshToken()
 
         user.refreshToken = refreshToken
-        await user.save({ validateBeforeSave: false })
+        await doctor.save({ validateBeforeSave: false })
 
         return {accessToken, refreshToken}
 
@@ -28,40 +29,55 @@ const generateAccessAndRefereshTokens = async(userId) =>{
 
 const registerDoctor = asyncHandler( async (req, res) => {
 
-    const {fullname, username, email, password} = req.body
+    const {doctorName, email, password, specialization, experience, fee, qualifications, hospitalName, availableDays, availableTimeSlots} = req.body
 
     if(
-        [fullname, username, email, password].some((field) => field?.trim() === "")
+        [doctorName, email, password, specialization, experience, fee, qualifications, hospitalName, availableDays, availableTimeSlots].some((field) => field?.trim() === "")
     ) {
         throw new ApiError(400, "All field are require.")
     }
 
-    const existedUser = await User.findOne({
+    const existedDoctor = await Doctor.findOne({
         $or: [{ username }, { email }]
     })
 
-    if (existedUser) {
-        throw new ApiError(409, "User with email or username already exists")
+    if (existedDoctor) {
+        throw new ApiError(409, "Doctor with email or username already exists")
     }
 
-    const owner = await Doctor.create({
-        fullname,
+    const doctor = await Doctor.create({
+        doctorName,
         email,
         password,
-        username: username.toLowerCase()
+        specialization, 
+        experience, 
+        fee, 
+        qualifications, 
+        hospitalName, 
+        availableDays, 
+        availableTimeSlots
 
     })
 
-    const createdUser = User.findById(owner._id).select(" -password -refreshToken ")
+    const createdDoctor = Doctor.findById(doctor._id).select(" -password -refreshToken ")
 
-    if (!createdUser) {
+    if (!createdDoctor) {
         throw new ApiError(500, "somthing went wrong")
     }
 
     return res.status(201).json(
-        new ApiResponse(200, createdOwner.data, createdOwner.message)
+        new ApiResponse(200, createdDoctor.data, createdDoctor.message)
     )
 
 })
+
+// const loginDoctor = asyncHandler(async (req, res) => {
+//     const {email, password} = req.body
+
+//     if()
+// })
+
+
+
 
 export { registerDoctor }
