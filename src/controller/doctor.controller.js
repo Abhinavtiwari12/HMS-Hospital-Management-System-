@@ -71,11 +71,73 @@ const registerDoctor = asyncHandler( async (req, res) => {
 
 })
 
-// const loginDoctor = asyncHandler(async (req, res) => {
-//     const {email, password} = req.body
+const loginDoctor = asyncHandler(async (req, res) => {
+    const {email, password} = req.body
 
-//     if()
-// })
+    if (!email) {
+        throw new ApiError(401, "addharNumber is require.")
+    }
+
+    const doctor = await Doctor.findOne({email})
+
+    if (!doctor) {
+        throw new ApiError(401, "email or password is wrong.")
+    }
+
+    const checkPassword = await doctor.isPasswordCorrect(password)
+
+    if (!checkPassword) {
+        throw new ApiError(400, "email or password is wrong.")
+    }
+
+    const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(doctor._id)
+
+    const loggedInDoctor = await Doctor.findById(doctor._id).select("-password")
+
+    const options = {
+        httpOnly: true,
+        secure: false
+    }
+
+    return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options)
+    .json(new ApiResponse(200, { doctor: loggedInDoctor, accessToken, refreshToken}, "doctor loggedIn successfull."))
+
+})
+
+
+const doctorProfile = async (req, res) => {
+  return res.status(200).json({
+    success: true,
+    doctor: req.doctor,
+  })
+}
+
+
+
+const doctorlogout = asyncHandler(async (req, res) => {
+    await Doctor.findByIdAndUpdate(
+        req.doctor._id,
+        {
+            $unset: {
+                refreshToken: 1
+            }
+        },
+        {
+            new: true
+        }
+    )
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200,{}, "doctor logout success."))
+
+})
 
 
 
