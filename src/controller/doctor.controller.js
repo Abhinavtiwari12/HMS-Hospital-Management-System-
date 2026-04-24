@@ -1,7 +1,7 @@
 import express from "express"
-import { ApiError } from "../utills/apiError"
-import { ApiResponse } from "../utills/apiResponse"
-import { asyncHandler } from "../utills/asyncHandler"
+import { ApiError } from "../utils/apiError"
+import { ApiResponse } from "../utils/apiResponse"
+import { asyncHandler } from "../utils/asyncHandler"
 import { Doctor } from "../models/doctor.model"
 import { contains } from "validator"
 
@@ -75,7 +75,7 @@ const loginDoctor = asyncHandler(async (req, res) => {
     const {email, password} = req.body
 
     if (!email) {
-        throw new ApiError(401, "addharNumber is require.")
+        throw new ApiError(401, "email is require.")
     }
 
     const doctor = await Doctor.findOne({email})
@@ -142,4 +142,9 @@ const doctorlogout = asyncHandler(async (req, res) => {
 
 
 
-export { registerDoctor }
+export { 
+    registerDoctor, 
+    loginDoctor,
+    doctorProfile,
+    doctorlogout
+}
