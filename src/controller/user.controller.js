@@ -24,8 +24,6 @@ const generateAccessAndRefereshTokens = async(userId) =>{
 }
 
 
-
-
 const registerUser = asyncHandler( async (req, res) => {
 
     const {fullname, username, email, password, ganeder, dateOfBirth, phoneNumber} = req.body
@@ -68,7 +66,6 @@ const registerUser = asyncHandler( async (req, res) => {
 })
 
 
-
 const loginUser = asyncHandler(async (req, res) => {
     const {email, password} = req.body
 
@@ -109,7 +106,6 @@ const userProfile = async (req, res) => {
     user: req.user,
   })
 }
-
 
 
 const userlogout = asyncHandler(async (req, res) => {
