@@ -1,8 +1,9 @@
 import express from "express"
-import { ApiError } from "../utils/apiError"
-import { ApiResponse } from "../utils/apiResponse"
-import { asyncHandler } from "../utils/asyncHandler"
-import { User } from "../models/user.model"
+import { ApiError } from "../utils/apiError.js"
+import { ApiResponse } from "../utils/apiResponse.js"
+import { asyncHandler } from "../utils/asyncHandler.js"
+import { User } from "../models/user.model.js"
+import { Appointment } from "../models/appointment.model.js";
 
 
 
@@ -132,6 +133,59 @@ const userlogout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200,{}, "user logout success."))
 
 })
+
+
+import { Appointment } from "../models/appointment.model.js";
+
+
+export const bookAppointment = async (req, res) => {
+    try {
+        const patientId = req.user.id;
+        const { doctorId, appointmentDate, reason } = req.body;
+        
+        if (!doctorId || !appointmentDate) {
+          return res.status(400).json({
+            message: "Doctor and appointment date are required"
+          });
+        }
+    
+        const doctor = await User.findById(doctorId);
+        if (!doctor || doctor.role !== "doctor") {
+          return res.status(404).json({
+            message: "Doctor not found"
+          });
+        }
+    
+        const existingAppointment = await Appointment.findOne({
+          doctor: doctorId,
+          appointmentDate
+        });
+    
+        if (existingAppointment) {
+          return res.status(400).json({
+            message: "This time slot is already booked"
+          });
+        }
+    
+        const appointment = await Appointment.create({
+          patient: patientId,
+          doctor: doctorId,
+          appointmentDate,
+          reason
+        });
+    
+        return res.status(201).json({
+          message: "Appointment booked successfully",
+          appointment
+        });
+
+    } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Something went wrong"
+    });
+  }
+};
 
 
 export { registerUser,
