@@ -138,7 +138,7 @@ const userlogout = asyncHandler(async (req, res) => {
 import { Appointment } from "../models/appointment.model.js";
 
 
-export const bookAppointment = async (req, res) => {
+const bookAppointment = async (req, res) => {
     try {
         const patientId = req.user.id;
         const { doctorId, appointmentDate, reason } = req.body;
@@ -191,5 +191,6 @@ export const bookAppointment = async (req, res) => {
 export { registerUser,
     loginUser,
     userProfile,
-    userlogout
+    userlogout,
+    bookAppointment
  }
