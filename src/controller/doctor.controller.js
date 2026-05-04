@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/apiResponse"
 import { asyncHandler } from "../utils/asyncHandler"
 import { Doctor } from "../models/doctor.model"
 import { contains } from "validator"
+import { Appointment } from "../models/appointment.model.js";
 
 
 
@@ -23,8 +24,6 @@ const generateAccessAndRefereshTokens = async(userId) =>{
         throw new ApiError(500, "Something went wrong while generating referesh and access token")
     }
 }
-
-
 
 
 const registerDoctor = asyncHandler( async (req, res) => {
@@ -113,7 +112,6 @@ const doctorProfile = async (req, res) => {
 }
 
 
-
 const doctorlogout = asyncHandler(async (req, res) => {
     await Doctor.findByIdAndUpdate(
         req.doctor._id,
@@ -140,11 +138,39 @@ const doctorlogout = asyncHandler(async (req, res) => {
 })
 
 
+const getDoctorAppointments = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+
+    if (req.user.role !== "doctor") {
+      return res.status(403).json({
+        message: "Access denied. Only doctors can view appointments"
+      });
+    }
+
+    const appointments = await Appointment.find({ doctor: doctorId })
+      .populate("patient", "fullName email phoneNumber") // patient info
+      .sort({ appointmentDate: 1 }); // ascending order
+
+    return res.status(200).json({
+      message: "Appointments fetched successfully",
+      total: appointments.length,
+      appointments
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Something went wrong"
+    });
+  }
+};
 
 
 export { 
     registerDoctor, 
     loginDoctor,
     doctorProfile,
-    doctorlogout
+    doctorlogout,
+    getDoctorAppointments
 }
