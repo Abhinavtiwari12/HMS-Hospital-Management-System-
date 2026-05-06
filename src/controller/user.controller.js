@@ -27,42 +27,45 @@ const generateAccessAndRefereshTokens = async(userId) =>{
 
 const registerUser = asyncHandler( async (req, res) => {
 
-    const {fullname, username, email, password, ganeder, dateOfBirth, phoneNumber} = req.body
+    const {fullName, userName, email, password, ganeder, dateOfBirth, phoneNumber, role} = req.body
 
     if(
-        [fullname, username, email, password, ganeder, dateOfBirth, phoneNumber].some((field) => field?.trim() === "")
+        [fullName, userName, email, password, ganeder, dateOfBirth, phoneNumber, role].some((field) => field?.trim() === "")
     ) {
         throw new ApiError(400, "All field are require.")
     }
 
     const existedUser = await User.findOne({
-        $or: [{ username }, { email }]
+        $or: [{ userName }, { email }]
     })
 
     if (existedUser) {
         throw new ApiError(409, "User with email or username already exists")
     }
 
-    const owner = await User.create({
-        fullname,
+    const user = await User.create({
+        fullName,
         email,
         password,
-        username: username.toLowerCase(),
+        userName: userName.toLowerCase(),
         ganeder, 
         dateOfBirth, 
-        phoneNumber
+        phoneNumber,
+        role
 
     })
 
-    const createdUser = User.findById(owner._id).select(" -password -refreshToken ")
+    const createdUser = await User.findById(user._id).select(" -password -refreshToken ")
 
     if (!createdUser) {
         throw new ApiError(500, "somthing went wrong")
     }
 
-    return res.status(201).json(
-        new ApiResponse(200, createdUser.data, createdUser.message)
-    )
+    return res.status(201).json({
+        success: true,
+        message: "User registered successfully",
+        data: createdUser
+    });
 
 })
 
@@ -88,7 +91,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(user._id)
 
-    const loggedInUser = await user.findById(user._id).select("-password")
+    const loggedInUser = await User.findById(user._id).select("-password")
 
     const options = {
         httpOnly: true,
@@ -133,9 +136,6 @@ const userlogout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200,{}, "user logout success."))
 
 })
-
-
-import { Appointment } from "../models/appointment.model.js";
 
 
 const bookAppointment = async (req, res) => {

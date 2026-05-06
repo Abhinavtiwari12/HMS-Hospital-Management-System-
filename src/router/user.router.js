@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { bookAppointment, cancelAppointment, loginUser, registerUser, userlogout, userProfile } from "../controller/user.controller";
-import { verifyUserJwt } from "../middleware/autho.middleware";
+import { bookAppointment, cancelAppointment, loginUser, registerUser, userlogout, userProfile } from "../controller/user.controller.js";
+import { verifyUserJwt } from "../middleware/autho.middleware.js";
 
 
 
