@@ -1,9 +1,9 @@
 import express from "express"
-import { ApiError } from "../utils/apiError"
-import { ApiResponse } from "../utils/apiResponse"
-import { asyncHandler } from "../utils/asyncHandler"
-import { Doctor } from "../models/doctor.model"
-import { contains } from "validator"
+import { ApiError } from "../utils/apiError.js"
+import { ApiResponse } from "../utils/apiResponse.js"
+import { asyncHandler } from "../utils/asyncHandler.js"
+import { Doctor } from "../models/doctor.model.js"
+// import { contains } from "validator"
 import { Appointment } from "../models/appointment.model.js";
 
 

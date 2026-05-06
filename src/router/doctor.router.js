@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { verifyDoctorJwt } from "../middleware/autho.middleware";
-import { doctorlogout, doctorProfile, getDoctorAppointments, loginDoctor } from "../controller/doctor.controller";
+import { verifyDoctorJwt } from "../middleware/autho.middleware.js";
+import { doctorlogout, doctorProfile, getDoctorAppointments, loginDoctor } from "../controller/doctor.controller.js";
 
 
 
