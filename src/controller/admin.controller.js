@@ -1,9 +1,9 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/apiError.js"
 import { ApiResponse } from "../utils/apiResponse.js"
-import { findCandidates, registerCandidates } from "../service/admin.service.js"
+// import { findCandidates, registerCandidates } from "../service/admin.service.js"
 import { Admin } from "../models/admin.model.js"
-import { Candidate } from "../models/candidate.model.js"
+// import { Candidate } from "../models/candidate.model.js"
 
 
 
@@ -27,16 +27,16 @@ const generateAccessAndRefereshTokens = async(userId) =>{
 
 const registerNewAdmin = asyncHandler( async (req, res) => {
 
-    const {fullname, password, email, username} = req.body
+    const {adminName, password, email, userName} = req.body
 
     if(
-        [fullname, password, username, email].some((field) => field?.trim() === "")
+        [adminName, password, userName, email].some((field) => field?.trim() === "")
     ) {
         throw new ApiError(400, "All field are require.")
     }
 
     const existedUser = await Admin.findOne({
-       $or: [{ username }, { email }]
+       $or: [{ userName }, { email }]
     })
    
     if (existedUser) {
@@ -44,13 +44,13 @@ const registerNewAdmin = asyncHandler( async (req, res) => {
     }
 
     const admin = await Admin.create({
-       fullname,
+       adminName,
        email,
        password,
-       username: username.toLowerCase(),
+       userName: userName.toLowerCase(),
     })
 
-    const createdAdmin = Admin.findById(owner._id).select(" -password -refreshToken ")
+    const createdAdmin = Admin.findById(admin._id).select(" -password -refreshToken ")
 
     if (!createdAdmin) {
         throw new ApiError(500, "somthing went wrong")
