@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { verifyUserJwt } from "../middleware/autho.middleware";
-import { adminlogin, adminlogout, adminProfile, registerNewAdmin } from "../controller/admin.controller";
-import { registerDoctor } from "../controller/doctor.controller";
+import { verifyUserJwt } from "../middleware/autho.middleware.js";
+import { adminlogin, adminlogout, adminProfile, registerNewAdmin } from "../controller/admin.controller.js";
+import { registerDoctor } from "../controller/doctor.controller.js";
 
 
 
