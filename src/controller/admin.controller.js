@@ -50,15 +50,21 @@ const registerNewAdmin = asyncHandler( async (req, res) => {
        userName: userName.toLowerCase(),
     })
 
-    const createdAdmin = Admin.findById(admin._id).select(" -password -refreshToken ")
+    const createdAdmin = await Admin.findById(admin._id).select(" -password -refreshToken ")
 
     if (!createdAdmin) {
         throw new ApiError(500, "somthing went wrong")
     }
 
-    return res.status(201).json(
-        new ApiResponse(201, createdAdmin.data, createdAdmin.message)
-    )
+    // return res.status(201).json(
+    //     new ApiResponse(201, createdAdmin.data, createdAdmin.message)
+    // )
+    
+    return res.status(201).json({
+        success: true,
+        message: "User registered successfully",
+        data: createdAdmin
+    });
 
 })
 
@@ -68,13 +74,13 @@ const adminlogin = asyncHandler(async (req, res) => {
     const {email, password} = req.body
 
     if (!email) {
-        throw new ApiError(401, "addharNumber is require.")
+        throw new ApiError(401, "email is require.")
     }
 
     const admin = await Admin.findOne({ email })
 
     if (!admin) {
-        throw new ApiError(400, "addharNumber or password is wrong.")
+        throw new ApiError(400, "email or password is wrong.")
     }
 
     const checkPassword = await admin.isPasswordCorrect(password)

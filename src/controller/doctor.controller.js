@@ -28,20 +28,33 @@ const generateAccessAndRefereshTokens = async(userId) =>{
 
 const registerDoctor = asyncHandler( async (req, res) => {
 
-    const {doctorName, email, password, specialization, experience, fee, qualifications, hospitalName, availableDays, availableTimeSlots} = req.body
+    const {doctorName, email, password, specialization, experience, fees, qualifications, hospitalName, availableDays, availableTimeSlots} = req.body
 
-    if(
-        [doctorName, email, password, specialization, experience, fee, qualifications, hospitalName, availableDays, availableTimeSlots].some((field) => field?.trim() === "")
+    // if(
+    //     [doctorName, email, password, specialization, experience, fees, qualifications, hospitalName, availableDays].some((field) => field?.trim() === "") || !Array.isArray(availableTimeSlots) || availableTimeSlots.length === 0
+    // ) {
+    //     throw new ApiError(400, "All field are require.")
+    // }
+    if (
+        !doctorName?.trim() ||
+        !email?.trim() ||
+        !password?.trim() ||
+        !specialization?.trim() ||
+        typeof experience !== "number" ||
+        typeof fees !== "number" ||
+        !Array.isArray(qualifications) ||
+        !Array.isArray(availableDays) ||
+        !Array.isArray(availableTimeSlots)
     ) {
-        throw new ApiError(400, "All field are require.")
+        throw new ApiError(400, "Invalid or missing fields");
     }
 
     const existedDoctor = await Doctor.findOne({
-        $or: [{ username }, { email }]
+        $or: [{ doctorName }, { email }]
     })
 
     if (existedDoctor) {
-        throw new ApiError(409, "Doctor with email or username already exists")
+        throw new ApiError(409, "Doctor with email or doctorName already exists")
     }
 
     const doctor = await Doctor.create({
@@ -50,7 +63,7 @@ const registerDoctor = asyncHandler( async (req, res) => {
         password,
         specialization, 
         experience, 
-        fee, 
+        fees, 
         qualifications, 
         hospitalName, 
         availableDays, 
@@ -58,15 +71,17 @@ const registerDoctor = asyncHandler( async (req, res) => {
 
     })
 
-    const createdDoctor = Doctor.findById(doctor._id).select(" -password -refreshToken ")
+    const createdDoctor = await Doctor.findById(doctor._id).select(" -password -refreshToken ")
 
     if (!createdDoctor) {
         throw new ApiError(500, "somthing went wrong")
     }
 
-    return res.status(201).json(
-        new ApiResponse(200, createdDoctor.data, createdDoctor.message)
-    )
+    return res.status(201).json({
+        success: true,
+        message: "User registered successfully",
+        data: createdDoctor
+    });
 
 })
 
