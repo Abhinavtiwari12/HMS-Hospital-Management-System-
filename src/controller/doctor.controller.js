@@ -14,7 +14,7 @@ const generateAccessAndRefereshTokens = async(userId) =>{
         const accessToken = doctor.generateAccessToken()
         const refreshToken = doctor.generateRefreshToken()
 
-        user.refreshToken = refreshToken
+        doctor.refreshToken = refreshToken
         await doctor.save({ validateBeforeSave: false })
 
         return {accessToken, refreshToken}
